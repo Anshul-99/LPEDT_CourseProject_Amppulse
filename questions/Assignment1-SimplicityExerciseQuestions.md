@@ -1,0 +1,31 @@
+Please include your answers to the questions below with your submission, entering into the space below each question
+See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/) for github markdown formatting if desired.
+
+**1. How much current does the system draw (instantaneous measurement) when a single LED is on with the GPIO pin set to StrongAlternateStrong?**
+   Answer: 5.02mA  ![Screenshot_Q1](C:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment1-Anshul-99\questions\LED0_StrongStrong.PNG)
+
+
+**2. How much current does the system draw (instantaneous measurement) when a single LED is on with the GPIO pin set to WeakAlternateWeak?**
+   Answer: 5.01mA ![Screenshot_Q2](C:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment1-Anshul-99\questions\LED0_WeakWeak.PNG)
+
+
+**3. Is there a meaningful difference in current between the answers for question 1 and 2? Please explain your answer, 
+referencing the [Mainboard Schematic](https://www.silabs.com/documents/public/schematic-files/WSTK-Main-BRD4001A-A01-schematic.pdf) and [AEM Accuracy](https://www.silabs.com/documents/login/user-guides/ug279-brd4104a-user-guide.pdf) section of the user's guide where appropriate. Extra credit is avilable for this question and depends on your answer.**
+   Answer: 
+   1. The AEM has a measuring range of 0.1uA to 95mA with an accuracy of 0.1mA. The reading in question1 and question2 vary between 4.9mA and 5.0mA. Due to the accuracy, the exact reading to the 2nd decimal place wasn't possible.
+   
+   2. Drive strength is the amount of current supplied by the I/O pin to reach a logic level. In question1 and question2, the voltage level remained the same irrespective of the LED ON/OFF state,  only the current varied. Since the logic level was the same, drive strength became irrelevant. When the slew rate is greater than 0, only then the drive strength will come in picture. This is because drive strength is varied by varying slew rate according to application notes AN0012 section 4.4 https://www.silabs.com/documents/public/application-notes/an0012-efm32-gpio.pdf
+   
+   3. Rise and fall times is based on slew rate. For small capacitance loads, slew rate can be achieved using any drive strength. There won't be much difference. For high capacitance loads, the drive strength will affect the slew rate and rise/fall times. According to the schematic, the LEDs are connected to the GPIO via a resistor. The only capacitance loads are intrinsic capacitances which is small.
+   
+   The current supplied is based on the drive strength.
+
+
+**4. With the WeakAlternateWeak drive strength setting, what is the average current for 1 complete on-off cycle for 1 LED with an on-off duty cycle of 50% (approximately 1 sec on, 1 sec off)?**
+   Answer: 4.65mA ![Screenshot_Q4](C:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment1-Anshul-99\questions\LED_1_Duty_cycle.PNG)
+
+
+**5. With the WeakAlternateWeak drive strength setting, what is the average current for 1 complete on-off cycle for 2 LEDs (both on at the time same and both off at the same time) with an on-off duty cycle of 50% (approximately 1 sec on, 1 sec off)?**
+   Answer: 4.90mA ![Screenshot_Q5](C:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment1-Anshul-99\questions\LED_2_Duty_Cycle.PNG)
+
+
