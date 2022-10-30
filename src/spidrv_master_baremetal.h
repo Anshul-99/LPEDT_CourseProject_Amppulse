@@ -34,4 +34,6 @@ void spidrv_app_process_action();
 
 void read_data_BME680(void);
 
+int32_t get_BME680_data(uint8_t parameter);
+
 #endif  // SPIDRV_BAREMETAL_H

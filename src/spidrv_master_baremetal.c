@@ -36,6 +36,7 @@
 #include "spidrv.h"
 #include "sl_spidrv_instances.h"
 #include "sl_spidrv_exp_config.h"
+#include "math.h"
 
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
@@ -102,6 +103,8 @@
 #define BME680_T1_LSB_REG (8)                   // Register for gas calibration
 #define BME680_T1_MSB_REG (9)                   // Register for gas calibration
 
+#define SEALEVELPRESSURE_HPA (1013.25)
+
 /*******************************************************************************
  ***************************  LOCAL VARIABLES   ********************************
  ******************************************************************************/
@@ -125,6 +128,7 @@ int8_t   _H3, _H4, _H5, _H7, _G1, _G3, _T3, _P3, _P6, _P7, _res_heat,
 uint16_t _H1, _H2, _T1, _P1;                                // unsigned 16bit configuration vars
 int16_t  _G2, _T2, _P2, _P4, _P5, _P8, _P9;                 // signed 16bit configuration vars
 int32_t  _tfine, _Temperature, _Pressure, _Humidity, _Gas;  // signed 32bit configuration vars
+uint32_t _altitude;
 
 struct BME680_data
 {
@@ -607,6 +611,7 @@ void read_data_BME680()
        printf("temp: %3d.%02d\n\r", (_Temperature/100), (_Temperature%100));
        printf("Pressure: %7d.%02d\n\r", (_Pressure/100), (_Pressure%100));
        printf("Humidity: %3d.%03d\n\r", (_Humidity/1000), (_Humidity%1000));
+       printf("Altitude: %d\n\r", _altitude);
 #endif
 
 #if(LCD_SETTING == 1)
@@ -695,3 +700,34 @@ void spidrv_app_process_action(void)
       sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 }
+
+uint32_t get_Altitude(int32_t pressure)
+{
+  float atmospheric = pressure / 100.0F;
+  _altitude =  44330.0 * (1.0 - pow(atmospheric / SEALEVELPRESSURE_HPA, 0.1903));
+  return _altitude;
+}
+
+int32_t get_BME680_data(uint8_t parameter)
+{
+  switch(parameter)
+  {
+    case 0:
+      return _Temperature;
+      break;
+    case 1:
+      return  _Pressure;
+      break;
+    case 2:
+      return _Humidity;
+      break;
+    case 3:
+      return get_Altitude(_Pressure);
+      break;
+    default:
+      return 0;
+      break;
+  }
+}
+
+

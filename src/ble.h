@@ -58,6 +58,18 @@ uint8_t advertisingSetHandle;
 bool indication_flight_flag; /* true if indication sent and waiting for ack from client */
 bool temp_indication_enable; /* true if indications enabled for temperature measurement characteristic */
 
+bool indication_flight_flag_temp2; /* true if indication sent and waiting for ack from client */
+bool temp2_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+
+bool indication_flight_flag_humidity; /* true if indication sent and waiting for ack from client */
+bool humdity_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+
+bool indication_flight_flag_pressure; /* true if indication sent and waiting for ack from client */
+bool pressure_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+
+bool indication_flight_flag_altitude; /* true if indication sent and waiting for ack from client */
+bool altitude_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+
 #endif
 // values unique for client
 #if(DEVICE_IS_BLE_SERVER == 0)

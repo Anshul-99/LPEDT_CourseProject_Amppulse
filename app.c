@@ -252,7 +252,7 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
   // and don’t necessarily advance our state machines.
   // For assignment 5 uncomment the next 2 function calls
 
-//   handle_ble_event(evt); // put this code in ble.c/.h
+   handle_ble_event(evt); // put this code in ble.c/.h
 
 #if (DEVICE_IS_BLE_SERVER == 1)
   // sequence through states driven by events
