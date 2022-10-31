@@ -43,14 +43,11 @@ typedef enum event_type
 typedef enum state_server_t
 {
   Wait_for_UF,
+  BMA456,
   Send_indication_Humidity,
   Send_indication_Pressure,
   Send_indication_Temperature,
   Send_indication_Altitude,
-  Wait_for_COMP1_1,
-  Wait_for_COMP1_2,
-  Wait_for_I2CWrite,
-  Wait_for_I2CRead
 } state_server_t;
 
 typedef enum state_client_t

@@ -103,5 +103,54 @@ void read_from_sensor()
     }
 }
 
+void I2C_write_write(uint8_t slave_id, uint8_t reg_addr, uint8_t* wdata, uint8_t length)
+{
+
+  I2C_TransferReturn_TypeDef transferStatus;
+  // shift device address left
+  transfer_info.addr = slave_id << 1;
+  // read flag
+  transfer_info.flags = I2C_FLAG_WRITE_WRITE;
+  // pointer to data to write
+  transfer_info.buf[0].data = &reg_addr;
+  transfer_info.buf[0].len = 1;
+  transfer_info.buf[1].data = wdata;
+  transfer_info.buf[1].len = length;
+
+  // start transfer
+  transferStatus = I2CSPM_Transfer (I2C0, &transfer_info);
+  if (transferStatus != i2cTransferDone)
+    {
+      LOG_ERROR("I2C_write_write(): I2C bus read of slave_id=%x failed %x\n\r", slave_id, transferStatus);
+    }
+
+}
+
+
+
+void I2C_write_read(uint8_t slave_id, uint8_t reg_addr, uint8_t *rdata, uint8_t length)
+{
+
+  I2C_TransferReturn_TypeDef transferStatus;
+  // shift device address left
+  transfer_info.addr = slave_id << 1;
+  // read flag
+  transfer_info.flags = I2C_FLAG_WRITE_READ;
+  // pointer to data to write
+  transfer_info.buf[0].data = &reg_addr;
+  transfer_info.buf[0].len = 1;
+  transfer_info.buf[1].data = rdata;
+  transfer_info.buf[1].len = length;
+
+
+  // start transfer
+  transferStatus = I2CSPM_Transfer (I2C0, &transfer_info);
+  if (transferStatus != i2cTransferDone)
+    {
+      LOG_ERROR("I2C_write_read(): I2C bus read of slave_id=%x failed", slave_id);
+    }
+
+}
+
 
 

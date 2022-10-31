@@ -35,7 +35,9 @@
 #include "gatt_db.h"
 #include "spidrv_master_baremetal.h"
 
-#include "math.h" // DOS added for pow()
+#include "step_counter.h"
+
+#include "math.h"
 
 #include "sl_bt_api.h"
 
@@ -62,6 +64,7 @@ int32_t temperature;
 int32_t pressure;
 int32_t humidity;
 uint32_t altitude;
+uint32_t steps;
 
 void temperature_state_machine(sl_bt_msg_t *evt)
 {
@@ -79,23 +82,8 @@ void temperature_state_machine(sl_bt_msg_t *evt)
       {
         next_state = Wait_for_UF;
 
-//        if((ble_data_ptr->connectionOpen == false) || (ble_data_ptr->temp_indication_enable == false))
-//          {
-//            next_state = Wait_for_UF;
-//          }
-//
-//        else if ( (evt->data.evt_system_external_signal.extsignals == UF_event) &&
-//                     (ble_data_ptr->connectionOpen) ) // DOS
-//          {
-////            toggle_power(Sensor_ON); /* switch on sensor */
-//            timerWaitUs_irq(80*1000); /* wait for 80ms */
-//            next_state = Wait_for_COMP1_1; /* change state */
-//            LOG_INFO("Wait_for_UF -> Wait_for_COMP1_1");
-//          }
-
         if  (evt->data.evt_system_external_signal.extsignals == UF_event)
           {
-//            sl_power_manager_add_em_requirement(EM1); /* Change lowest energy mode to EM1 */
             read_data_BME680();
             next_state = Wait_for_UF;
 
@@ -104,7 +92,8 @@ void temperature_state_machine(sl_bt_msg_t *evt)
             humidity = (get_BME680_data(2))/10;
             altitude = (get_BME680_data(3))*100;
 
-//            uint8_t humidity_buffer[4];
+            steps = BMA456_getStepCounterOutput();
+            LOG_ERROR("Steps: %d\n\r", steps);
 
             if(ble_data_ptr->connectionOpen == true)
               {

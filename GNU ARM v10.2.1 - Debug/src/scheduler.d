@@ -76,7 +76,11 @@ src/scheduler.o: ../src/scheduler.c \
  ../src/i2c.h ../src/timers.h ../src/ble.h ../src/ble_device_type.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\autogen/gatt_db.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\protocol\bluetooth\inc/sli_bt_gattdb_def.h \
- ../src/spidrv_master_baremetal.h ../src/log.h \
+ ../src/spidrv_master_baremetal.h ../src/step_counter.h \
+ C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma456.h \
+ C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma4.h \
+ C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma4_defs.h \
+ ../src/log.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\app\common\util\app_log/app_log.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\iostream\inc/sl_iostream.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\common\inc/sl_enum.h \
@@ -174,6 +178,10 @@ C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gec
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\autogen/gatt_db.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\protocol\bluetooth\inc/sli_bt_gattdb_def.h:
 ../src/spidrv_master_baremetal.h:
+../src/step_counter.h:
+C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma456.h:
+C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma4.h:
+C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src/bma4_defs.h:
 ../src/log.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\app\common\util\app_log/app_log.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\iostream\inc/sl_iostream.h:

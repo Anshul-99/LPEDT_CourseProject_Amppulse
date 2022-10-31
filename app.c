@@ -62,6 +62,7 @@
 #include "em_i2c.h"
 #include "src/ble.h"
 #include "src/spidrv_master_baremetal.h"
+#include "src/step_counter.h"
 
 #include "src/ble_device_type.h"
 
@@ -189,8 +190,12 @@ SL_WEAK void app_init(void)
   #endif
 
     gpioInit();
+    init_i2c();
     init_irq_letimer0();
     spidrv_app_init();
+
+    BMA456_initialize(RANGE_4G, ODR_1600_HZ, NORMAL_AVG4, CONTINUOUS);
+    BMA456_stepCounterEnable(WRIST_CONFIG, true);
 #if(LCD_SETTING == 1)
     memlcd_app_init();
 #endif

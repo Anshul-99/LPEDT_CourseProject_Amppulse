@@ -301,124 +301,101 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #if(DEBUG_BLE == 1)
         LOG_INFO("Characteristic status");
 #endif
-//        if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature_measurement)
-//          {
-//            if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
-//              {
-//                if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-//                  {
-//                    //indications are enabled
-//                    ble_data->temp_indication_enable = true;
-//                  }
-//                else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
-//                  {
-//                    //indications are disabled
-//                    ble_data->temp_indication_enable = false;
-////                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-//                  }
-//              }
-//            else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-//              {
-//                //indication rx ack
-//                //clear indication-in-flight when ack is received from client
-//                ble_data->indication_flight_flag = false;
-//              }
-//          }
 
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature )
-                  {
-                    if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
-                      {
-                        if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-                          {
-                            //indications are enabled
-                            ble_data->temp2_indication_enable = true;
-                          }
-                        else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
-                          {
-                            //indications are disabled
-                            ble_data->temp2_indication_enable = false;
-        //                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-                          }
-                      }
-                    else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-                      {
-                        //indication rx ack
-                        //clear indication-in-flight when ack is received from client
-                        ble_data->indication_flight_flag_temp2 = false;
-                      }
-                  }
+        {
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            {
+              if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
+                {
+                  //indications are enabled
+                  ble_data->temp2_indication_enable = true;
+                }
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+                {
+                  //indications are disabled
+                  ble_data->temp2_indication_enable = false;
+//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
+                }
+            }
+          else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+            {
+              //indication rx ack
+              //clear indication-in-flight when ack is received from client
+              ble_data->indication_flight_flag_temp2 = false;
+            }
+        }
 
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_humidity)
-                  {
-                    if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
-                      {
-                        if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-                          {
-                            //indications are enabled
-                            ble_data->humdity_indication_enable = true;
-                          }
-                        else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
-                          {
-                            //indications are disabled
-                            ble_data->humdity_indication_enable = false;
-        //                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-                          }
-                      }
-                    else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-                      {
-                        //indication rx ack
-                        //clear indication-in-flight when ack is received from client
-                        ble_data->indication_flight_flag_humidity = false;
-                      }
-                  }
+        {
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            {
+              if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
+                {
+                  //indications are enabled
+                  ble_data->humdity_indication_enable = true;
+                }
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+                {
+                  //indications are disabled
+                  ble_data->humdity_indication_enable = false;
+//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
+                }
+            }
+          else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+            {
+              //indication rx ack
+              //clear indication-in-flight when ack is received from client
+              ble_data->indication_flight_flag_humidity = false;
+            }
+        }
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_pressure )
-                  {
-                    if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
-                      {
-                        if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-                          {
-                            //indications are enabled
-                            ble_data->pressure_indication_enable = true;
-                          }
-                        else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
-                          {
-                            //indications are disabled
-                            ble_data->pressure_indication_enable = false;
-        //                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-                          }
-                      }
-                    else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-                      {
-                        //indication rx ack
-                        //clear indication-in-flight when ack is received from client
-                        ble_data->indication_flight_flag_pressure = false;
-                      }
-                  }
+        {
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            {
+              if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
+                {
+                  //indications are enabled
+                  ble_data->pressure_indication_enable = true;
+                }
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+                {
+                  //indications are disabled
+                  ble_data->pressure_indication_enable = false;
+//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
+                }
+            }
+          else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+            {
+              //indication rx ack
+              //clear indication-in-flight when ack is received from client
+              ble_data->indication_flight_flag_pressure = false;
+            }
+        }
 
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_elevation )
-                          {
-                            if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
-                              {
-                                if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
-                                  {
-                                    //indications are enabled
-                                    ble_data->altitude_indication_enable = true;
-                                  }
-                                else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
-                                  {
-                                    //indications are disabled
-                                    ble_data->altitude_indication_enable = false;
-                //                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
-                                  }
-                              }
-                            else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
-                              {
-                                //indication rx ack
-                                //clear indication-in-flight when ack is received from client
-                                ble_data->indication_flight_flag_altitude = false;
-                              }
-                          }
+        {
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            {
+              if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
+                {
+                  //indications are enabled
+                  ble_data->altitude_indication_enable = true;
+                }
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+                {
+                  //indications are disabled
+                  ble_data->altitude_indication_enable = false;
+//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
+                }
+            }
+          else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+            {
+              //indication rx ack
+              //clear indication-in-flight when ack is received from client
+              ble_data->indication_flight_flag_altitude = false;
+            }
+        }
 
         break;
       }
@@ -492,12 +469,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
        * @{
        * @brief Indicates that a soft timer has lapsed.
        */
-    case sl_bt_evt_system_soft_timer_id:
-      {
+//    case sl_bt_evt_system_soft_timer_id:
+//      {
         //TODO: Toggle EXTCOMIN periodically
 //        displayUpdate();
-        break;
-      }
+//        break;
+//      }
 
       /**
        * @addtogroup sl_bt_evt_sm_confirm_bonding sl_bt_evt_sm_confirm_bonding
@@ -570,8 +547,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
 //#endif
 
 //        display_data("Bonded");
-        break;
-      }
+//        break;
+//      }
 
       /**
        * @addtogroup sl_bt_evt_sm_bonding_failed sl_bt_evt_sm_bonding_failed
@@ -590,5 +567,6 @@ void handle_ble_event(sl_bt_msg_t *evt)
 //          }
 //        break;
 //      }
-//  }
+  }
+}
 #endif
