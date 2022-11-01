@@ -14,27 +14,17 @@
 ​ * ​ ​ @brief Contains function prototypes for initializing, reading and writing to Si7021 Temperature sensor via I2C
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 1 2022
-​ * ​ ​ @version​ ​ 1.0
+​ * ​ ​ @date​ ​ October 31 2022
+​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources https://docs.silabs.com/gecko-platform/latest/driver/api/group-i2cspm
- *              Si7021-A20.pdf
- *              Si 70xx humidity and temp sensor designers guide AN607.pdf
- *              SILabs I2C Application Note - AN0011.pdf
- *              efr32xg13-rm.pdf
- *              Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 #ifndef SRC_I2C_H_
 #define SRC_I2C_H_
 
 #include <stdint.h>
-
-#define DEV_ADDRESS_WRITE (0x80) /* 0x40 <<1 */
-#define DEV_ADDRESS_READ (0x81) /* (0x40 <<1)||(0x01) */
-#define TEMP_CMD 0xF3
-
-
 
 /**
 ​ * ​ ​ @brief​ ​ Initializes I2C0
@@ -46,25 +36,29 @@
 void init_i2c();
 
 /**
+ *   @Author: Bhargav Chauhan
 ​ * ​ ​ @brief​ ​ writes data/command on the I2C bus using interrupts
 ​ *
-​ * ​ ​ @param​ ​ uint16_t dev_addr: Device address
- *           uint8_t *data_buffer: Pointer to buffer that contains data/command to be written on the bus
- *           uint16_t length_buffer: Length of the buffer​
+​ * ​ ​ @param​ ​ uint8_t slave_id: sensor address
+ *           uint8_t reg_addr: register address on the sensor that is to be written
+ *           uint8_t* wdata: Pointer to buffer that contains data to be written to the register
+ *           uint8_t length: Length of the buffer​
 ​ *
 ​ * ​ ​ @return​ ​ void.
 ​ */
-void write_to_sensor();
+void I2C_write_write(uint8_t slave_id, uint8_t reg_addr, uint8_t* wdata, uint8_t length);
 
 /**
+ *   @Author: Bhargav Chauhan
 ​ * ​ ​ @brief​ ​ Reads data from the I2C bus using interrupts
 ​ *
-​ * ​ ​ @param​ ​ uint16_t dev_addr: Device address
- *           uint8_t *data_buffer: Pointer to buffer that can store the data/command read from the bus
- *           uint16_t length_buffer: Length of the buffer​
+​ * ​ ​ @param​ ​ uint8_t slave_id: sensor address
+ *           uint8_t reg_addr: register address on the sensor that is to be read
+ *           uint8_t* rdata: Pointer to buffer that stores data read from the register
+ *           uint8_t length: Length of the buffer​
 ​ *
 ​ * ​ ​ @return​ ​ void.
 ​ */
-void read_from_sensor();
+void I2C_write_read(uint8_t slave_id, uint8_t reg_addr, uint8_t *rdata, uint8_t length);
 
 #endif /* SRC_I2C_H_ */

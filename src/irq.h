@@ -14,12 +14,11 @@
 ​ * ​ ​ @brief Contains function prototypes for initializing the interrupt
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 4 2022
+​ * ​ ​ @date​ ​ October 31 2022
 ​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources https://docs.silabs.com/gecko-platform/latest/emlib/api/efr32xg22/group-core
- *              efr32xg13-rm.pdf
- *              Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 

@@ -14,12 +14,11 @@
 ​ * ​ ​ @brief Contains functions for initializing the interrupt and defines the interrupt handler
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 4 2022
+​ * ​ ​ @date​ ​ October 31 2022
 ​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources https://docs.silabs.com/gecko-platform/latest/emlib/api/efr32xg22/group-core
- *              efr32xg13-rm.pdf
- *              Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -30,15 +29,14 @@
 #include "scheduler.h"
 #include "em_i2c.h"
 
-#include "app.h" // DOS
+#include "app.h"
 
 // Include logging specifically for this .c file
 #define INCLUDE_LOG_DEBUG 1
 #include "log.h"
-#define EM1 1
+//#define EM1 1
 
-volatile int flag =0; /* Global variable that keeps track of the LED status. It's used to toggle the LED */
-volatile int flag1 =0;
+//volatile int flag1 =0;
 uint32_t ms_from_boot = 0; /* Milliseconds that have passed since the system started */
 
 void init_irq_letimer0()
@@ -60,14 +58,18 @@ void LETIMER0_IRQHandler(void)
 {
   CORE_CriticalDisableIrq(); /* Enter critical section. Disable interrupts to prevent a race condition */
 
-  flag = LETIMER_IntGetEnabled(LETIMER0);
+  /*Get the interrupts that are enabled */
+  uint32_t flag = LETIMER_IntGetEnabled(LETIMER0);
 
+  /* Check if interrupt was caused due to LETIMER underflow */
   if(flag == LETIMER_IEN_UF)
     {
-      ms_from_boot += 3000;
+      ms_from_boot += LETIMER_PERIOD_MS;
       Scheduler_SetEvent_UF(); /* Set event flag for reading temperature */
       LETIMER_IntClear(LETIMER0, LETIMER_IEN_UF); /* Clear the UnderFlow interrupt flag. */
     }
+  //TODO: Probably not going to be used in project. Keeping code just in case its needed */
+  /*Check if interrupt was caused due to LETIMER COMP1 value matching counter */
   if (flag == LETIMER_IEN_COMP1)
     {
       Scheduler_SetEvent_COMP1();
@@ -117,45 +119,3 @@ uint32_t letimerMilliseconds()
 {
   return ms_from_boot;
 }
-
-// DOS added:
-
-// *************************************************************************
-// CPU sysTicks implementation.
-// *************************************************************************
-
-#ifdef MY_USE_SYSTICKS
-
-// global variable
-uint32_t    sysTicks = 0;   // # of ticks
-
-// SysTick interrupt Handler. See startup file startup_LPC17xx.s for SysTick vector
-// Linker picks up this label and inserts into the IRQ vector table
-// CPU clears the NVIC IRQ pending bit when it fetches the first instruction of this routine
-void SysTick_Handler(void) {
-
-  sysTicks++;
-
-    #ifdef DEBUG1
-    LOG_INFO("ST");
-    #endif
-
-    // How does the system get back to lower sleep levels after taking this IRQ?
-    // See the ARM M4 Tech Ref Manual section 6.1.2:
-    //   the processor also supports the use of SLEEPONEXIT, that causes the processor core to
-    //   enter sleep mode when it returns from an exception handler to Thread mode. See the ARM®v7-M
-  //   Architecture Reference Manual for more information.
-
-} // SysTick_Handler()
-
-
-// *************************************************************************
-// Return the value of sysTicks - the CPU's sysTick driven counter stored
-// in the variable sysTicks
-// No inputs, @param returns uint32_t with the number ticks since pwr up
-// *************************************************************************
-uint32_t getSysTicks (void) {
-  return (sysTicks);
-} // getSysTicks()
-
-#endif

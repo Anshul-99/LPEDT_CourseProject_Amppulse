@@ -14,12 +14,11 @@
 ​ * ​ ​ @brief Contains function prototypes and data structures related to BLE
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 14 2022
-​ * ​ ​ @version​ ​ 1.0
+​ * ​ ​ @date​ ​ October 31 2022
+​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources Class slides
- *              https://docs.silabs.com/bluetooth/latest/a00079#gad50a8f6e37b3fb4da9a85bd78bbbdb14
- *              A5 Command Table
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -29,58 +28,47 @@
 #include <stdbool.h>
 #include "ble_device_type.h"
 
-
-#define UINT8_TO_BITSTREAM(p, n) { *(p)++ = (uint8_t)(n); }
-#define UINT32_TO_BITSTREAM(p, n) { *(p)++ = (uint8_t)(n); *(p)++ = (uint8_t)((n) >> 8); \
-                                    *(p)++ = (uint8_t)((n) >> 16); *(p)++ = (uint8_t)((n) >> 24); }
-#define UINT32_TO_FLOAT(m, e) (((uint32_t)(m) & 0x00FFFFFFU) | (uint32_t)((int32_t)(e) << 24))
-
-
-// BLE Data Structure, save all of our private BT data in here.
-// Modern C (circa 2021 does it this way)
-// typedef ble_data_struct_t is referred to as an anonymous struct definition
-
-
+/* This struct contains information related to BLE connection
+ * between server and client device that is used in the
+ * application code.
+ */
 typedef struct {
-// values that are common to servers and clients
-bd_addr myAddress;
-uint8_t Address_type;
-bool    connectionOpen; // DOS, true when a connection is open
-uint8_t connectionHandle; /* stores the connection handle present in the relevant BLE data structure */
 
-uint8_t bonding_handle; /* Handle generated when bonding coonfirmed */
+bd_addr myAddress; // address of the device running the code.
+uint8_t Address_type; // address type of the device running the code.
+bool    connectionOpen; // Flag that keeps a track of status of BLE connection made by the device
+uint8_t connectionHandle; // Stores the connection handle of the connection made by the device
+
+uint8_t bonding_handle; // Handle generated when bonding is confirmed
 
 #if(DEVICE_IS_BLE_SERVER == 1)
 // values unique for server
-// The advertising set handle allocated from Bluetooth stack.
-uint8_t advertisingSetHandle;
 
-bool indication_flight_flag; /* true if indication sent and waiting for ack from client */
-bool temp_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+uint8_t advertisingSetHandle; // The advertising set handle allocated from Bluetooth stack.
 
-bool indication_flight_flag_temp2; /* true if indication sent and waiting for ack from client */
-bool temp2_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+/* Flag is set to true when indication is in flight for temperature characteristic and the device is
+ * waiting for an ack from server */
+bool indication_flight_flag_temp2;
+/* Flag is set to true when indications for temperature characteristic is enabled by client device */
+bool temp2_indication_enable;
 
-bool indication_flight_flag_humidity; /* true if indication sent and waiting for ack from client */
-bool humdity_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+/* Flag is set to true when indication is in flight for humidity characteristic and the device is
+ * waiting for an ack from server */
+bool indication_flight_flag_humidity;
+/* Flag is set to true when indications for humidity characteristic is enabled by client device */
+bool humdity_indication_enable;
 
-bool indication_flight_flag_pressure; /* true if indication sent and waiting for ack from client */
-bool pressure_indication_enable; /* true if indications enabled for temperature measurement characteristic */
+/* Flag is set to true when indication is in flight for pressure characteristic and the device is
+ * waiting for an ack from server */
+bool indication_flight_flag_pressure;
+/* Flag is set to true when indications for pressure characteristic is enabled by client device */
+bool pressure_indication_enable;
 
-bool indication_flight_flag_altitude; /* true if indication sent and waiting for ack from client */
-bool altitude_indication_enable; /* true if indications enabled for temperature measurement characteristic */
-
-#endif
-// values unique for client
-#if(DEVICE_IS_BLE_SERVER == 0)
-
-uint8_t scanning_mode; // Passive scanning
-uint8_t phys; //1M phys
-uint32_t service_handle; //stores service handle for the temperature service on server
-uint8_t uuid_value_service[2]; // stores UUID of the temperature service on the server
-uint8_t uuid_value_char[2];// stores UUID of the temperature characteristic on the server
-uint16_t characteristic_handle;//stores characteristic handle for the temperature measurement characteristic on server
-bd_addr server_addr; //server address that we want the client to connect to
+/* Flag is set to true when indication is in flight for elevation characteristic and the device is
+ * waiting for an ack from server */
+bool indication_flight_flag_altitude;
+/* Flag is set to true when indications for elevation characteristic is enabled by client device */
+bool altitude_indication_enable;
 
 #endif
 

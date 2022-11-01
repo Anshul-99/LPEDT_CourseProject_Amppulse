@@ -72,7 +72,7 @@ src/step_counter.o: ../src/step_counter.c \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\sleeptimer\inc/sl_sleeptimer.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\config/sl_sleeptimer_config.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\common\inc/sl_status.h \
- ../src/log.h \
+ ../src/i2c.h ../src/log.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\app\common\util\app_log/app_log.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\iostream\inc/sl_iostream.h \
  C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\common\inc/sl_enum.h \
@@ -162,6 +162,7 @@ C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99/src
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\sleeptimer\inc/sl_sleeptimer.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\config/sl_sleeptimer_config.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\common\inc/sl_status.h:
+../src/i2c.h:
 ../src/log.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\app\common\util\app_log/app_log.h:
 C\:\Users\anshu\SimplicityStudio\v5_workspace\ecen5823-assignment7-Anshul-99\gecko_sdk_3.2.3\platform\service\iostream\inc/sl_iostream.h:

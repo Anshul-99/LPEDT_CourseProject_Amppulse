@@ -11,13 +11,16 @@
 /**
 ​ * ​ ​ @file​ ​ schedulers.h
 ​ *
-​ * ​ ​ @brief  Contains function prototypes for setting, clearing and keeping track of events
+​ * ​ ​ @brief Contains functions for setting, clearing and keeping track of events.
+ *          Also contains the state machine that implements the application code
+ *          except the BLE implementation.
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 1 2022
-​ * ​ ​ @version​ ​ 1.0
+​ * ​ ​ @date​ ​ October 31 2022
+​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -39,37 +42,27 @@ typedef enum event_type
 } event_type; /* Enum for each flag */
 
 
-
 typedef enum state_server_t
 {
   Wait_for_UF,
-  BMA456,
   Send_indication_Humidity,
   Send_indication_Pressure,
   Send_indication_Temperature,
   Send_indication_Altitude,
 } state_server_t;
 
-typedef enum state_client_t
-{
-  Scanning,
-  Get_characteristic,
-  Get_notification,
-  Send_confirmation
-} state_client_t;
-
-
 /* Following snippet of code will be execute only if the device is server */
 #if (DEVICE_IS_BLE_SERVER == 1)
 /**
-​ * ​ ​ @brief​ ​ State machine that is used to measure temperature from Si7021
+​ * ​ ​ @brief​ ​ State machine that is used to measure data from sensors and
+ *           implement other functionality
 ​ *
 ​ * ​ ​ @param​ ​ sl_bt_msg_t *evt: Pointer to event that has occurred.
  *           This is responded to only if the event is external signals​
 ​ *
 ​ * ​ ​ @return​ ​ void.
 ​ */
-void temperature_state_machine(sl_bt_msg_t *evt);
+void sensor_state_machine(sl_bt_msg_t *evt);
 
 #endif
 
@@ -98,10 +91,5 @@ void Scheduler_SetEvent_COMP1();
 ​ * ​ ​ @return​ ​ void.
 ​ */
 void Scheduler_SetEvent_I2C();
-
-
-
-//TODO: Add function header here
-void discovery_state_machine(sl_bt_msg_t *evt);
 
 #endif /* SRC_SCHEDULER_H_ */

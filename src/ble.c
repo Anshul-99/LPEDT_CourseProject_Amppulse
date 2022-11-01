@@ -14,13 +14,11 @@
 ​ * ​ ​ @brief Contains functions related to BLE
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ March 4 2022
+​ * ​ ​ @date​ ​ October 31 2022
 ​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources Class slides
- *              https://docs.silabs.com/bluetooth/latest/a00079#gad50a8f6e37b3fb4da9a85bd78bbbdb14
- *              A5 Command Table
- *              A7 Command Table
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -53,14 +51,7 @@
 #define CONNECTION_LATENCY (4) /* According to A7 guidelines */
 #define CONNECTION_TIMEOUT (82.5) /* (((1+CONNECTION_LATENCY)*(CONNECTION_MAX_INTERVAL*1.25)*2)/10) */
 #define CONNECTION_MIN_CE_LENGTH (0x0000) /* default value */
-#define CONNECTION_MAX_CE_LENGTH (4) /* According to A7 guidelines */
-
-#if (DEVICE_IS_BLE_SERVER == 0)
-/*Timing Parameters for advertising */
-#define SCANNING_MODE (0) /*Passive Scanning */
-#define SCANNING_INTERVAL (80) /*50ms/0.625ms) */
-#define SCANNING_WINDOW (40) /*25ms /0.625 )*/
-#endif
+#define CONNECTION_MAX_CE_LENGTH (4)
 
 
 // BLE private data
@@ -70,25 +61,6 @@ ble_data_struct_t* ret_ptr()
 {
   return &ble_data;
 }
-
-/**
-​ * ​ ​ @brief​ ​ Wrapper function to display important info on the LCD.
-​ *
-​ * ​ ​ @param​ ​ char *status: String that informs the status of the device
- *                         wrt to the network stack​
-​ *
-​ * ​ ​ @return​ ​ void.
-​ */
-//static void display_data(char *status)
-//{
-//  ble_data_struct_t* ble_data;
-//  ble_data = ret_ptr();
-//  displayPrintf(DISPLAY_ROW_CONNECTION, status); /* Display connection status */
-//  displayPrintf(DISPLAY_ROW_NAME, BLE_DEVICE_TYPE_STRING); /* Display device type, server/client */
-//  displayPrintf(DISPLAY_ROW_BTADDR, "%x:%x:%x:%x:%x:%x", ble_data->myAddress.addr[5], ble_data->myAddress.addr[4], ble_data->myAddress.addr[3],
-//                                                        ble_data->myAddress.addr[2], ble_data->myAddress.addr[1],  ble_data->myAddress.addr[0]); /* device address */
-//  displayPrintf(DISPLAY_ROW_ASSIGNMENT, ASSIGNMENT_NO); /* Display assignment number */
-//}
 
 void handle_ble_event(sl_bt_msg_t *evt)
 {
@@ -124,8 +96,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
         LOG_INFO("BOOT");
 #endif
 
-        /* Initialize the on-board display*/
-//        displayInit();
+        //TODO: Good from a demo perspective. Terrible from a user perspective
+        /*Remove previous bondings with other devices */
         ret_val = sl_bt_sm_delete_bondings();
         if(ret_val != SL_STATUS_OK)
           {
@@ -134,13 +106,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
 
         /* set the flags to a default state */
         ble_data->connectionOpen         = false;
-        ble_data->temp_indication_enable = false;
-        ble_data->indication_flight_flag = false;
         ble_data->Address_type = 0;
 
         ble_data->indication_flight_flag_humidity = false;
         ble_data->indication_flight_flag_pressure = false;
         ble_data->indication_flight_flag_temp2 = false;
+
         ble_data->pressure_indication_enable = false;
         ble_data->humdity_indication_enable = false;
         ble_data->temp2_indication_enable = false;
@@ -176,9 +147,6 @@ void handle_ble_event(sl_bt_msg_t *evt)
             LOG_ERROR("Error in starting advertiser mode %d\n\r", ret_val);
           }
 
-//        display_data("ADVERTISING");
-
-
         break;
       }
 
@@ -212,9 +180,9 @@ void handle_ble_event(sl_bt_msg_t *evt)
             LOG_ERROR("Error in stopping advertiser mode %d\n\r", ret_val);
           }
 
-
         /* Get the connection handle from the data structure */
         ble_data->connectionHandle = evt->data.evt_connection_opened.connection;
+
         /* Send a request with a set of parameters to the master */
         ret_val = sl_bt_connection_set_parameters(ble_data->connectionHandle, CONNECTION_MIN_INTERVAL, CONNECTION_MAX_INTERVAL,
                                         CONNECTION_LATENCY, CONNECTION_TIMEOUT, CONNECTION_MIN_CE_LENGTH, CONNECTION_MAX_CE_LENGTH);
@@ -224,7 +192,6 @@ void handle_ble_event(sl_bt_msg_t *evt)
             LOG_ERROR("Error in setting connection mode timing values %d\n\r", ret_val);
           }
 
-//        display_data("CONNECTED");
         break;
       }
 
@@ -240,8 +207,10 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #endif
 
         /* connection closed */
-        ble_data->connectionOpen = false; // DOS
+        ble_data->connectionOpen = false;
 
+        //TODO: Good from a demo perspective. Terrible from a user perspective
+        /*Delete information of devices that were previously bonded to */
         ret_val = sl_bt_sm_delete_bondings();
         if(ret_val != SL_STATUS_OK)
           {
@@ -256,8 +225,6 @@ void handle_ble_event(sl_bt_msg_t *evt)
             LOG_ERROR("Error in starting advertiser mode %d\n\r", ret_val);
           }
 
-//        display_data("ADVERTISING");
-//        displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
         break;
       }
 
@@ -269,6 +236,8 @@ void handle_ble_event(sl_bt_msg_t *evt)
        */
     case sl_bt_evt_connection_parameters_id:
       {
+        //TODO: Change connection parameters to optimize power consumption and use this state to check the
+        //connection parameter configuration
         /* Log connection timing parameters that are being implemented for answering questions in assignment 5 */
 //       if(ble_data->connectionHandle == evt->data.evt_connection_parameters.connection)
 //         {
@@ -302,97 +271,114 @@ void handle_ble_event(sl_bt_msg_t *evt)
         LOG_INFO("Characteristic status");
 #endif
 
+        /*Check the characteristic whose configuration descriptor was changed by remote GATT client */
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_temperature )
         {
-          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            /* Check if client changed configuration */
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)
             {
+              /*Check if indication was enabled by client */
               if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
                 {
-                  //indications are enabled
+                  /*Set indication enabled flag to true */
                   ble_data->temp2_indication_enable = true;
                 }
-              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+              /* Check if indications are disabled by client */
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
                 {
-                  //indications are disabled
+                  /*Set indication enabled flag to false */
                   ble_data->temp2_indication_enable = false;
-//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
                 }
             }
+          /* Confirmation for indication received by server from client */
           else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
             {
-              //indication rx ack
-              //clear indication-in-flight when ack is received from client
+              /* Ack for indication received from client. Means that indication was received.
+               * Hence indication is not in flight */
               ble_data->indication_flight_flag_temp2 = false;
             }
         }
 
+        /*Check the characteristic whose configuration descriptor was changed by remote GATT client */
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_humidity)
         {
-          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            /* Check if client changed configuration */
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)
             {
+              /*Check if indication was enabled by client */
               if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
                 {
-                  //indications are enabled
+                  /*Set indication enabled flag to true */
                   ble_data->humdity_indication_enable = true;
                 }
-              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+              /* Check if indications are disabled by client */
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
                 {
-                  //indications are disabled
+                  /*Set indication enabled flag to false */
                   ble_data->humdity_indication_enable = false;
-//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
                 }
             }
+          /* Confirmation for indication received by server from client */
           else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
             {
-              //indication rx ack
-              //clear indication-in-flight when ack is received from client
+              /* Ack for indication received from client. Means that indication was received.
+               * Hence indication is not in flight */
               ble_data->indication_flight_flag_humidity = false;
             }
         }
+
+        /*Check the characteristic whose configuration descriptor was changed by remote GATT client */
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_pressure )
         {
-          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            /* Check if client changed configuration */
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)
             {
+              /*Check if indication was enabled by client */
               if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
                 {
-                  //indications are enabled
+                  /*Set indication enabled flag to true */
                   ble_data->pressure_indication_enable = true;
                 }
-              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+              /* Check if indications are disabled by client */
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
                 {
-                  //indications are disabled
+                  /*Set indication enabled flag to false */
                   ble_data->pressure_indication_enable = false;
-//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
                 }
             }
+          /* Confirmation for indication received by server from client */
           else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
             {
-              //indication rx ack
-              //clear indication-in-flight when ack is received from client
+              /* Ack for indication received from client. Means that indication was received.
+               * Hence indication is not in flight */
               ble_data->indication_flight_flag_pressure = false;
             }
         }
 
+        /*Check the characteristic whose configuration descriptor was changed by remote GATT client */
         if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_elevation )
         {
-          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)//client configuration has been changed
+            /* Check if client changed configuration */
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)
             {
+              /*Check if indication was enabled by client */
               if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
                 {
-                  //indications are enabled
+                  /*Set indication enabled flag to true */
                   ble_data->altitude_indication_enable = true;
                 }
-              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable) // DOS
+              /* Check if indications are disabled by client */
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
                 {
-                  //indications are disabled
+                  /*Set indication enabled flag to false */
                   ble_data->altitude_indication_enable = false;
-//                    displayPrintf(DISPLAY_ROW_TEMPVALUE, "");
                 }
             }
+          /* Confirmation for indication received by server from client */
           else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
             {
-              //indication rx ack
-              //clear indication-in-flight when ack is received from client
+              /* Ack for indication received from client. Means that indication was received.
+               * Hence indication is not in flight */
               ble_data->indication_flight_flag_altitude = false;
             }
         }
@@ -413,53 +399,55 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #if(DEBUG_BLE == 1)
         LOG_INFO("Indication timeout");
 #endif
-        if(ble_data->indication_flight_flag == true)
-          {
-            //indication sent but no response received.
-            /*This event indicates confirmation from the remote GATT client has not
-              been received within 30 seconds after an indication was sent
-              Furthermore, the stack does not allow GATT transactions over this connection.*/
 
-            //reset all the flags to default
-            ble_data->indication_flight_flag = false;
-            //log error message
-            LOG_ERROR("Indication timeout \n\r");
-          }
         if(ble_data->indication_flight_flag_temp2 == true)
           {
-            //indication sent but no response received.
+            /*indication sent but no response received */
             /*This event indicates confirmation from the remote GATT client has not
               been received within 30 seconds after an indication was sent
               Furthermore, the stack does not allow GATT transactions over this connection.*/
 
-            //reset all the flags to default
+            //TODO: reset all the flags to default
             ble_data->indication_flight_flag_temp2 = false;
-            //log error message
+
             LOG_ERROR("Indication timeout temp2 \n\r");
           }
         if(ble_data->indication_flight_flag_humidity == true)
           {
-            //indication sent but no response received.
+            /*indication sent but no response received */
             /*This event indicates confirmation from the remote GATT client has not
               been received within 30 seconds after an indication was sent
               Furthermore, the stack does not allow GATT transactions over this connection.*/
 
-            //reset all the flags to default
+            //TODO: reset all the flags to default
             ble_data->indication_flight_flag_humidity = false;
-            //log error message
+
             LOG_ERROR("Indication timeout humidity \n\r");
           }
         if(ble_data->indication_flight_flag_pressure == true)
           {
-            //indication sent but no response received.
+            /*indication sent but no response received */
             /*This event indicates confirmation from the remote GATT client has not
               been received within 30 seconds after an indication was sent
               Furthermore, the stack does not allow GATT transactions over this connection.*/
 
-            //reset all the flags to default
+            //TODO: reset all the flags to default
             ble_data->indication_flight_flag_pressure = false;
-            //log error message
+
             LOG_ERROR("Indication timeout pressure\n\r");
+          }
+
+        if(ble_data->indication_flight_flag_altitude == true)
+          {
+            /*indication sent but no response received */
+            /*This event indicates confirmation from the remote GATT client has not
+              been received within 30 seconds after an indication was sent
+              Furthermore, the stack does not allow GATT transactions over this connection.*/
+
+            //TODO: reset all the flags to default
+            ble_data->indication_flight_flag_altitude = false;
+
+            LOG_ERROR("Indication timeout altitude\n\r");
           }
         break;
       }

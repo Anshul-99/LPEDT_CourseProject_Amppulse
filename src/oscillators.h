@@ -16,6 +16,9 @@
 ​ * ​ ​ @author​ ​ Anshul Somani
 ​ * ​ ​ @date​ ​ January 24 2022
 ​ * ​ ​ @version​ ​ 1.0
+ *
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 

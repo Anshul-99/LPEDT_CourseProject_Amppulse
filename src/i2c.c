@@ -11,18 +11,14 @@
 /**
 ​ * ​ ​ @file​ ​ i2c.c
 ​ *
-​ * ​ ​ @brief Contains functions for initializing, reading and writing to Si7021 Temperature sensor via I2C
+​ * ​ ​ @brief Contains functions for initializing, reading and writing on I2C bus
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ February 1 2022
-​ * ​ ​ @version​ ​ 1.0
+​ * ​ ​ @date​ ​ October 31 2022
+​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources https://docs.silabs.com/gecko-platform/latest/driver/api/group-i2cspm
- *              Si7021-A20.pdf
- *              Si 70xx humidity and temp sensor designers guide AN607.pdf
- *              SILabs I2C Application Note - AN0011.pdf
- *              efr32xg13-rm.pdf
- *              Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -37,14 +33,14 @@
 
 
 I2C_TransferSeq_TypeDef transfer_info; /*Struct instance containing device address, flags, data buffer, etc */
-uint8_t cmd_data; /* Command to be sent to Si7021 sensor */
-volatile uint16_t read_data =0; /* Stores the data received from the sensor */
+//uint8_t cmd_data; /* Command to be sent to Si7021 sensor */
+//volatile uint16_t read_data =0; /* Stores the data received from the sensor */
 
 void init_i2c()
 {
 
 
-  /* Configure I2C0 to communicate with the Si 7021 temperature sensor */
+  /* Configure I2C0 to communicate with sensors on I2C bus */
   I2CSPM_Init_TypeDef I2C_config = {
       .port    = I2C0,
       .sclPort = gpioPortC,
@@ -59,48 +55,6 @@ void init_i2c()
   };
 
   I2CSPM_Init(&I2C_config);
-}
-
-
-
-void write_to_sensor()
-{
-  I2C_TransferReturn_TypeDef ret_val; /* Stores return value given by I2CSPM_Transfer() */
-
-  init_i2c();
-
-  cmd_data = TEMP_CMD;
-  transfer_info.addr = DEV_ADDRESS_WRITE; /* Device address of the slave device */
-  transfer_info.flags = I2C_FLAG_WRITE; /* Flag indicating that data is to be written to the bus */
-  transfer_info.buf[0].len= sizeof(cmd_data); /* Length of data buffer */
-  transfer_info.buf[0].data = &cmd_data;
-
-  NVIC_EnableIRQ(I2C0_IRQn);
-
-  ret_val = I2C_TransferInit(I2C0, &transfer_info);
-  if(ret_val <0)
-    {
-      LOG_ERROR("I2C TransferInit() write error = %d", ret_val);
-    }
-}
-
-void read_from_sensor()
-{
-  I2C_TransferReturn_TypeDef ret_val; /* Stores return value given by I2CSPM_Transfer() */
-
-  init_i2c();
-
-  transfer_info.addr = DEV_ADDRESS_READ; /* Device address of the slave device */
-  transfer_info.flags = I2C_FLAG_READ; /* Flag indicating that data is to be read from the bus */
-  transfer_info.buf[0].len= 2; /* Length of data buffer */
-
-  NVIC_EnableIRQ(I2C0_IRQn);
-
-  ret_val = I2C_TransferInit(I2C0, &transfer_info);
-  if(ret_val <0)
-    {
-      LOG_ERROR("I2C TransferInit() write error = %d", ret_val);
-    }
 }
 
 void I2C_write_write(uint8_t slave_id, uint8_t reg_addr, uint8_t* wdata, uint8_t length)

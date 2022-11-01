@@ -14,10 +14,12 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+
+//TODO: Documentation for this needs to be updated once LCD implementation is finalized.
+
 #include <stdio.h>
 
 #include "sl_board_control.h"
-//#include "sl_simple_button_instances.h"
 #include "em_assert.h"
 #include "glib.h"
 #include "dmd.h"
@@ -26,6 +28,7 @@
 #include "em_cmu.h"
 #include "sl_power_manager.h"
 #include "stdio.h"
+#include "string.h"
 
 /*******************************************************************************
  *******************************   DEFINES   ***********************************

@@ -10,25 +10,12 @@
 
  */
 
-
-// *****************************************************************************
-// Students:
-// We will be creating additional functions that configure and manipulate GPIOs.
-// For any new GPIO function you create, place that function in this file.
-// *****************************************************************************
-
 #include <stdbool.h>
 #include "em_gpio.h"
 #include <string.h>
 #include "timers.h"
 
-
-// Student Edit: Define these, 0's are placeholder values.
-// See the radio board user guide at https://www.silabs.com/documents/login/user-guides/ug279-brd4104a-user-guide.pdf
-// and GPIO documentation at https://siliconlabs.github.io/Gecko_SDK_Doc/efm32g/html/group__GPIO.html
-// to determine the correct values for these.
-
-#define LED0_port  gpioPortF // change to correct ports and pins
+#define LED0_port  gpioPortF
 #define LED0_pin   4
 #define LED1_port  gpioPortF
 #define LED1_pin   5
@@ -44,15 +31,9 @@
 // Set GPIO drive strengths and modes of operation
 void gpioInit()
 {
-
-  // Student Edit:
-
-//	GPIO_DriveStrengthSet(LED0_port, gpioDriveStrengthStrongAlternateStrong);
 	GPIO_DriveStrengthSet(LED0_port, gpioDriveStrengthWeakAlternateWeak);
 	GPIO_PinModeSet(LED0_port, LED0_pin, gpioModePushPull, false);
 
-	//GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthStrongAlternateStrong);
-	//GPIO_DriveStrengthSet(LED1_port, gpioDriveStrengthWeakAlternateWeak);
 	GPIO_PinModeSet(LED1_port, LED1_pin, gpioModePushPull, false);
 
 	//configure PD15 to output to control power to the temperature sensor

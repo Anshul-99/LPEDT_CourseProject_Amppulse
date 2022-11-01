@@ -17,10 +17,8 @@
 ​ * ​ ​ @date​ ​ February 4 2022
 ​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources https://docs.silabs.com/gecko-platform/latest/emlib/api/efr32xg22/group-letimer
- *              efr32xg13-rm.pdf
- *              Class slides
- *              I took help from professor for timerWaitUs(uint32_t us_wait)
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -114,15 +112,8 @@ void timerWaitUs_poll(uint32_t us_wait)
         }
 #endif
 
-
-
-// ****************************************************************************************************************
-// For assignment 4, you have to figure out how to calculate the required value to load into the COMP1 register!
-// ****************************************************************************************************************
-
   uint32_t cntr_val_initial =  LETIMER_CounterGet(LETIMER0);
 
-  // DOS
   while (ticks_us != 0) {
 
       cntr_val = LETIMER_CounterGet(LETIMER0);
@@ -135,7 +126,7 @@ void timerWaitUs_poll(uint32_t us_wait)
           cntr_val_initial = LETIMER_CounterGet(LETIMER0);
       }
 
-  } // while
+  }
 
   return;
 }
@@ -167,10 +158,6 @@ void timerWaitUs_irq(uint32_t us_wait)
           return;
         }
 #endif
-
-// ****************************************************************************************************************
-// For assignment 4, you have to figure out how to calculate the required value to load into the COMP1 register!
-// ****************************************************************************************************************
 
   const uint32_t cntr_val_initial =  LETIMER_CounterGet(LETIMER0);
   int32_t val_to_load = cntr_val_initial - ticks_us;

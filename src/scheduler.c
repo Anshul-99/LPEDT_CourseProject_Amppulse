@@ -11,13 +11,16 @@
 /**
 ​ * ​ ​ @file​ ​ schedulers.c
 ​ *
-​ * ​ ​ @brief Contains functions for setting, clearing and keeping track of events
+​ * ​ ​ @brief Contains functions for setting, clearing and keeping track of events.
+ *          Also contains the state machine that implements the application code
+ *          except the BLE implementation.
 ​ *
 ​ * ​ ​ @author​ ​ Anshul Somani
-​ * ​ ​ @date​ ​ March 4 2022
+​ * ​ ​ @date​ ​ October 31 2022
 ​ * ​ ​ @version​ ​ 2.0
  *
- *   @resources Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ *
 ​ */
 
@@ -54,10 +57,10 @@
 /* Following snippet of code will be execute only if the device is server */
 #if (DEVICE_IS_BLE_SERVER == 1)
 
-int32_t temp_celcius =0;
+//int32_t temp_celcius =0;
 state_server_t next_state = Wait_for_UF;
-extern uint16_t read_data; /* Stores the data received from the sensor */
-extern I2C_TransferSeq_TypeDef transfer_info; /* Data structure that contains device address, flags, stc for I2C */
+//extern uint16_t read_data; /* Stores the data received from the sensor */
+//extern I2C_TransferSeq_TypeDef transfer_info; /* Data structure that contains device address, flags, stc for I2C */
 sl_status_t ret_val;
 
 int32_t temperature;
@@ -66,15 +69,18 @@ int32_t humidity;
 uint32_t altitude;
 uint32_t steps;
 
-void temperature_state_machine(sl_bt_msg_t *evt)
+void sensor_state_machine(sl_bt_msg_t *evt)
 {
-  ble_data_struct_t   *ble_data_ptr = ret_ptr(); // DOS
+  ble_data_struct_t   *ble_data_ptr = ret_ptr();
 
+  /*Check if the event is not an external signal event.
+   * If it isn't an external event, return */
   if(SL_BT_MSG_ID(evt->header) != sl_bt_evt_system_external_signal_id)
     {
       return;
     }
 
+  /*Run state machine to implement functionality */
   switch(next_state)
   {
 
@@ -82,43 +88,48 @@ void temperature_state_machine(sl_bt_msg_t *evt)
       {
         next_state = Wait_for_UF;
 
+        /*LETIMER0 UF event occured */
         if  (evt->data.evt_system_external_signal.extsignals == UF_event)
           {
+            /*Read data from BME680 sensor */
             read_data_BME680();
-            next_state = Wait_for_UF;
+//            next_state = Wait_for_UF;
 
+            /*Getter functions to get the data measured by BME680 sensor */
             temperature = get_BME680_data(0);
             pressure = get_BME680_data(1)*10;
             humidity = (get_BME680_data(2))/10;
             altitude = (get_BME680_data(3))*100;
 
+            /* Read the step counter value from BMA456 */
             steps = BMA456_getStepCounterOutput();
             LOG_ERROR("Steps: %d\n\r", steps);
 
+            /*Write sensor data to local GATT database */
             if(ble_data_ptr->connectionOpen == true)
               {
-                /* update humidity value in the GATT BD on the server */
+                /* update humidity value in the GATT DB on the server */
                 ret_val = sl_bt_gatt_server_write_attribute_value(gattdb_humidity, 0, 4, (uint8_t*)&humidity);
                 if(ret_val != SL_STATUS_OK)
                   {
                     LOG_ERROR("Error in writing attribute value humidity %x\n\r", ret_val);
                   }
 
-                /* update temperature value in the GATT BD on the server */
+                /* update pressure value in the GATT DB on the server */
                 ret_val = sl_bt_gatt_server_write_attribute_value(gattdb_pressure, 0, 4, (uint8_t*)&pressure);
                 if(ret_val != SL_STATUS_OK)
                   {
                     LOG_ERROR("Error in writing attribute value pressure %x\n\r", ret_val);
                   }
 
-                /* update temperature value in the GATT BD on the server */
+                /* update temperature value in the GATT DB on the server */
                 ret_val = sl_bt_gatt_server_write_attribute_value(gattdb_temperature, 0, 4, (uint8_t*)&temperature);
                 if(ret_val != SL_STATUS_OK)
                   {
                     LOG_ERROR("Error in writing attribute value temp2 %x\n\r", ret_val);
                   }
 
-                /* update temperature value in the GATT BD on the server */
+                /* update altitude value in the GATT DB on the server */
                 ret_val = sl_bt_gatt_server_write_attribute_value(gattdb_elevation, 0, 4, (uint8_t*)&altitude);
                 if(ret_val != SL_STATUS_OK)
                   {
@@ -131,7 +142,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
         break;
       }
 
-    case Send_indication_Humidity: /* Wait in this state until COMP1 interupt occurs */
+    case Send_indication_Humidity: /* Enter state after sensor data is written to server GATT DB */
          {
            next_state = Send_indication_Humidity;
 
@@ -147,7 +158,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
                  }
                else
                  {
-                   //set indication-in-flight to true
+                   /*Set indication in flight flag to true */
                    ble_data_ptr->indication_flight_flag_humidity = true;
                  }
                next_state = Send_indication_Pressure;
@@ -155,7 +166,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
            break;
          }
 
-    case Send_indication_Pressure: /* Wait in this state until COMP1 interupt occurs */
+    case Send_indication_Pressure: /* Enter state after humidity indication is sent */
          {
            next_state = Send_indication_Pressure;
 
@@ -171,7 +182,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
                  }
                else
                  {
-                   //set indication-in-flight to true
+                   /*Set indication in flight flag to true */
                    ble_data_ptr->indication_flight_flag_pressure = true;
                  }
                next_state = Send_indication_Temperature;
@@ -179,7 +190,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
            break;
          }
 
-    case Send_indication_Temperature: /* Wait in this state until COMP1 interupt occurs */
+    case Send_indication_Temperature: /* Enter state after pressure indication is sent */
          {
            next_state = Send_indication_Temperature;
 
@@ -196,7 +207,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
                  }
                else
                  {
-                   //set indication-in-flight to true
+                   /*Set indication in flight flag to true */
                    ble_data_ptr->indication_flight_flag_temp2 = true;
                  }
                next_state = Send_indication_Altitude;
@@ -204,7 +215,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
            break;
          }
 
-    case Send_indication_Altitude: /* Wait in this state until COMP1 interupt occurs */
+    case Send_indication_Altitude: /* Enter state after temperature indication is sent */
          {
            next_state = Send_indication_Altitude;
 
@@ -221,7 +232,7 @@ void temperature_state_machine(sl_bt_msg_t *evt)
                  }
                else
                  {
-                   //set indication-in-flight to true
+                   /*Set indication in flight flag to true */
                    ble_data_ptr->indication_flight_flag_altitude = true;
                  }
                next_state = Wait_for_UF;

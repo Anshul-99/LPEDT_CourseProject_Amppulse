@@ -262,7 +262,7 @@ void sl_bt_on_event(sl_bt_msg_t *evt)
 #if (DEVICE_IS_BLE_SERVER == 1)
   // sequence through states driven by events
 
-   temperature_state_machine(evt);    // put this code in scheduler.c/.h
+   sensor_state_machine(evt);    // put this code in scheduler.c/.h
 
 #elif (DEVICE_IS_BLE_SERVER == 0)
 

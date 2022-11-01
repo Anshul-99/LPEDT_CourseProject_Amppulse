@@ -17,9 +17,8 @@
 ​ * ​ ​ @date​ ​ February 4 2022
 ​ * ​ ​ @version​ ​ 2.0
 ​ *
- *   @resources https://docs.silabs.com/gecko-platform/latest/emlib/api/efr32xg22/group-cmu
- *              efr32xg13-rm.pdf
- *              Class slides
+ *   The structure for this project and some code snippets have been taken from
+ *   the assignments for ECEN 5823 IoT course, University of Colorado Boulder
 ​ */
 
 
@@ -30,17 +29,12 @@
 
 void init_osc(CMU_Osc_TypeDef osc, CMU_Select_TypeDef source_clock)
 {
-  //CMU_Select_TypeDef clock_val;  /* Local variable used to cross-check ClockSelectSet() */
   CMU_ClkDiv_TypeDef prescalar; /* Local variable used to cross-check CMU_ClockDivSet() */
   uint32_t freq; /* Local variable used to cross-check frequency */
 
   CMU_OscillatorEnable(osc, 1, 1);
 
   CMU_ClockSelectSet(cmuClock_LFA, source_clock); /* Setting the clock branch to LFA ( Low Frequency A clock) and source as  LXFO/ULFRC0  */
-//  if(clock_val != source_clock)
-//    {
-//      return /*1*/;
-//    }
 
   CMU_ClockEnable(cmuClock_LFA, 1);
 
@@ -51,7 +45,7 @@ void init_osc(CMU_Osc_TypeDef osc, CMU_Select_TypeDef source_clock)
 
       if(prescalar != cmuClkDiv_1)
          {
-           return /*1*/;
+           return;
          }
     }
   else
@@ -61,7 +55,7 @@ void init_osc(CMU_Osc_TypeDef osc, CMU_Select_TypeDef source_clock)
 
       if(prescalar != cmuClkDiv_4)
          {
-           return /*1*/;
+           return;
          }
     }
 
@@ -71,8 +65,8 @@ void init_osc(CMU_Osc_TypeDef osc, CMU_Select_TypeDef source_clock)
 
   if(freq != FREQUENCY/4) /* 8192*/
     {
-      return /*1*/;
+      return;
     }
 
-  return /*0*/;
+  return;
 }

@@ -12,6 +12,7 @@
 #include "stdbool.h"
 #include "timers.h"
 #include "sl_sleeptimer.h"
+#include "i2c.h"
 
 // including log for this file
 #define INCLUDE_LOG_DEBUG 1
@@ -164,10 +165,8 @@ int32_t BMA456_getTemperature(void)
 uint32_t BMA456_getStepCounterOutput(void)
   {
     uint32_t step = 0;
-    uint16_t rslt;
 
-    rslt = bma456_step_counter_output(&step, &accel);
-//    LOG_ERROR("StepCntr Op %x\n\r", rslt);
+    bma456_step_counter_output(&step, &accel);
 
     return step;
   }
