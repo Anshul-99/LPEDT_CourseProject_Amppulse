@@ -35,6 +35,7 @@
 I2C_TransferSeq_TypeDef transfer_info; /*Struct instance containing device address, flags, data buffer, etc */
 //uint8_t cmd_data; /* Command to be sent to Si7021 sensor */
 //volatile uint16_t read_data =0; /* Stores the data received from the sensor */
+uint8_t rdata[2];
 
 void init_i2c()
 {
@@ -104,6 +105,12 @@ void I2C_write_read(uint8_t slave_id, uint8_t reg_addr, uint8_t *rdata, uint8_t 
       LOG_ERROR("I2C_write_read(): I2C bus read of slave_id=%x failed", slave_id);
     }
 
+}
+
+uint8_t bma456_get_part_id()
+{
+  I2C_write_read(0x19, 0x00, rdata, 1);
+  return rdata[0];
 }
 
 

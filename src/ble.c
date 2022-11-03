@@ -111,10 +111,12 @@ void handle_ble_event(sl_bt_msg_t *evt)
         ble_data->indication_flight_flag_humidity = false;
         ble_data->indication_flight_flag_pressure = false;
         ble_data->indication_flight_flag_temp2 = false;
+        ble_data->indication_flight_flag_stepcount = false;
 
         ble_data->pressure_indication_enable = false;
         ble_data->humdity_indication_enable = false;
         ble_data->temp2_indication_enable = false;
+        ble_data->stepcount_indication_enable = false;
 
         /* Returns the unique BT device address*/
         ret_val = sl_bt_system_get_identity_address(&(ble_data->myAddress), &(ble_data->Address_type));
@@ -171,7 +173,7 @@ void handle_ble_event(sl_bt_msg_t *evt)
 #endif
 
         /* connected to another device. */
-        ble_data->connectionOpen = true; // DOS
+        ble_data->connectionOpen = true;
 
         /* Stop advertising */
         ret_val = sl_bt_advertiser_stop(ble_data->advertisingSetHandle);
@@ -380,6 +382,34 @@ void handle_ble_event(sl_bt_msg_t *evt)
               /* Ack for indication received from client. Means that indication was received.
                * Hence indication is not in flight */
               ble_data->indication_flight_flag_altitude = false;
+            }
+        }
+
+        /*Check the characteristic whose configuration descriptor was changed by remote GATT client */
+        if(evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_daily_step_count )
+        {
+            /* Check if client changed configuration */
+          if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config)
+            {
+              /*Check if indication was enabled by client */
+              if(evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_indication)
+                {
+                  /*Set indication enabled flag to true */
+                  ble_data->stepcount_indication_enable = true;
+                }
+              /* Check if indications are disabled by client */
+              else if (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_server_disable)
+                {
+                  /*Set indication enabled flag to false */
+                  ble_data->stepcount_indication_enable = false;
+                }
+            }
+          /* Confirmation for indication received by server from client */
+          else if(evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_confirmation)
+            {
+              /* Ack for indication received from client. Means that indication was received.
+               * Hence indication is not in flight */
+              ble_data->indication_flight_flag_stepcount = false;
             }
         }
 

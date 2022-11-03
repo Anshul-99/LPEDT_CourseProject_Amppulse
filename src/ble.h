@@ -70,6 +70,12 @@ bool indication_flight_flag_altitude;
 /* Flag is set to true when indications for elevation characteristic is enabled by client device */
 bool altitude_indication_enable;
 
+/* Flag is set to true when indication is in flight for elevation characteristic and the device is
+ * waiting for an ack from server */
+bool indication_flight_flag_stepcount;
+/* Flag is set to true when indications for elevation characteristic is enabled by client device */
+bool stepcount_indication_enable;
+
 #endif
 
 } ble_data_struct_t;

@@ -49,6 +49,9 @@ typedef enum state_server_t
   Send_indication_Pressure,
   Send_indication_Temperature,
   Send_indication_Altitude,
+  Send_indication_StepCount,
+  Find_my_watch_alarm,
+  Read_phone_notifications,
 } state_server_t;
 
 /* Following snippet of code will be execute only if the device is server */

@@ -67,7 +67,9 @@ int32_t temperature;
 int32_t pressure;
 int32_t humidity;
 uint32_t altitude;
-uint32_t steps;
+uint32_t step_count;
+uint8_t alert;
+uint8_t client_notification_count;
 
 void sensor_state_machine(sl_bt_msg_t *evt)
 {
@@ -91,6 +93,7 @@ void sensor_state_machine(sl_bt_msg_t *evt)
         /*LETIMER0 UF event occured */
         if  (evt->data.evt_system_external_signal.extsignals == UF_event)
           {
+//            sl_power_manager_add_em_requirement(EM1); /* Change lowest energy mode to EM1 */
             /*Read data from BME680 sensor */
             read_data_BME680();
 //            next_state = Wait_for_UF;
@@ -101,9 +104,13 @@ void sensor_state_machine(sl_bt_msg_t *evt)
             humidity = (get_BME680_data(2))/10;
             altitude = (get_BME680_data(3))*100;
 
+            uint8_t chip_id;
+            chip_id = bma456_get_part_id();
+            LOG_INFO("Part ID of BMA456: 0x%x\n\r", chip_id);
             /* Read the step counter value from BMA456 */
-            steps = BMA456_getStepCounterOutput();
-            LOG_ERROR("Steps: %d\n\r", steps);
+            step_count = BMA456_getStepCounterOutput();
+            LOG_INFO("Steps: %d\n\r", step_count);
+//            sl_power_manager_remove_em_requirement(EM1); /* Change lowest energy mode to EM3 */
 
             /*Write sensor data to local GATT database */
             if(ble_data_ptr->connectionOpen == true)
@@ -134,6 +141,13 @@ void sensor_state_machine(sl_bt_msg_t *evt)
                 if(ret_val != SL_STATUS_OK)
                   {
                     LOG_ERROR("Error in writing attribute value altitude %x\n\r", ret_val);
+                  }
+
+                /* update step count value in the GATT DB on the server */
+                ret_val = sl_bt_gatt_server_write_attribute_value(gattdb_daily_step_count, 0, 4, (uint8_t*)&step_count);
+                if(ret_val != SL_STATUS_OK)
+                  {
+                    LOG_ERROR("Error in writing attribute value step count %x\n\r", ret_val);
                   }
 
                 next_state = Send_indication_Humidity;
@@ -234,6 +248,91 @@ void sensor_state_machine(sl_bt_msg_t *evt)
                  {
                    /*Set indication in flight flag to true */
                    ble_data_ptr->indication_flight_flag_altitude = true;
+                 }
+               next_state = Send_indication_StepCount;
+             }
+           break;
+         }
+
+         //TODO: This indication takes a lot more time compared to other indications. The MCU seems to stop working or something.
+         // Also, the basic assumption in making this state machine is that all the indications will be kept enabled throughout
+         // the life of the device. Is even one of the indications is disabled, the state machine will get stuck and won't work.
+    case Send_indication_StepCount: /* Enter state after elevation indication is sent */
+         {
+           next_state = Send_indication_StepCount;
+
+           if((ble_data_ptr->stepcount_indication_enable == true) && (ble_data_ptr->indication_flight_flag_stepcount == false)
+               && (ble_data_ptr->indication_flight_flag_pressure == false) && (ble_data_ptr->indication_flight_flag_humidity == false)
+               && (ble_data_ptr->indication_flight_flag_temp2 == false) && (ble_data_ptr->indication_flight_flag_altitude == false)
+               && (ble_data_ptr->connectionOpen == true))
+             {
+
+               /* Send an indication to the client */
+               ret_val = sl_bt_gatt_server_send_indication(ble_data_ptr->connectionHandle, gattdb_daily_step_count, 4,  (uint8_t*)&step_count);
+               if(ret_val != SL_STATUS_OK)
+                 {
+                   LOG_ERROR("Error in sending indication step count %x\n\r", ret_val);
+                 }
+               else
+                 {
+                   /*Set indication in flight flag to true */
+                   ble_data_ptr->indication_flight_flag_stepcount = true;
+                 }
+               next_state = Find_my_watch_alarm;
+             }
+           break;
+         }
+
+    case Find_my_watch_alarm: /* Enter state after elevation indication is sent */
+         {
+           next_state = Find_my_watch_alarm;
+
+           if((ble_data_ptr->indication_flight_flag_stepcount == false) && (ble_data_ptr->indication_flight_flag_pressure == false)
+               && (ble_data_ptr->indication_flight_flag_humidity == false) && (ble_data_ptr->indication_flight_flag_temp2 == false)
+               && (ble_data_ptr->indication_flight_flag_altitude == false) && (ble_data_ptr->connectionOpen == true))
+             {
+
+               sl_bt_gatt_server_read_attribute_value(gattdb_alert_level, 0, sizeof(alert), &alert, ((uint8_t *)&alert));
+               if(ret_val != SL_STATUS_OK)
+                 {
+                   LOG_ERROR("Error in Reading Alert %x\n\r", ret_val);
+                 }
+               else
+                 {
+                   if(alert != 0)
+                     {
+                       gpioLed0SetOn();
+                     }
+                   else if(alert == 0)
+                     {
+                       gpioLed0SetOff();
+                     }
+                 }
+               next_state = Read_phone_notifications;
+             }
+           break;
+         }
+
+    case Read_phone_notifications: /* Enter state after alert_level attribute is read is sent */
+         {
+           next_state = Read_phone_notifications;
+
+           if((ble_data_ptr->indication_flight_flag_stepcount == false) && (ble_data_ptr->indication_flight_flag_pressure == false)
+               && (ble_data_ptr->indication_flight_flag_humidity == false) && (ble_data_ptr->indication_flight_flag_temp2 == false)
+               && (ble_data_ptr->indication_flight_flag_altitude == false) && (ble_data_ptr->connectionOpen == true))
+             {
+
+               sl_bt_gatt_server_read_attribute_value(gattdb_client_notification_count, 0, sizeof(client_notification_count), &client_notification_count, ((uint8_t *)&client_notification_count));
+               if(ret_val != SL_STATUS_OK)
+                 {
+                   LOG_ERROR("Error in Reading Client notification count %x\n\r", ret_val);
+                 }
+               else
+                 {
+                   if(client_notification_count != 0)
+                     {
+                       LOG_INFO("%d Unread notifications\n\r", client_notification_count);
+                     }
                  }
                next_state = Wait_for_UF;
              }
